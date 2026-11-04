@@ -1,75 +1,110 @@
-# React + TypeScript + Vite
+# NOVA Admin
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A responsive admin dashboard built with **React 19, TypeScript, Vite, and Redux Toolkit** as part of the NOVA Frontend Technical Challenge.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Authentication:** Login, authentication state management, and protected routes.
+- **Dashboard:** Overview of store information and summary cards.
+- **Products:** Fetch, search, filter, view details, and add products.
+- **Users:** Fetch, search, view details, and add users.
+- **Internationalization:** Persian and English language support.
+- **Theming:** Light and Dark modes.
+- **Responsive Design:** Adaptable layout for different screen sizes.
+- **Form Validation:** Formik and Yup.
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- React 19
+- TypeScript
+- Vite
+- Redux Toolkit
+- React Router DOM
+- Axios
+- Formik & Yup
+- Styled Components
 
-## Expanding the ESLint configuration
+## Project Structure
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```text
+src/
+├── Components/
+│   └── Layout/
+├── Dictionary/
+├── Pages/
+│   ├── Auth/
+│   ├── Dashboard/
+│   ├── Products/
+│   └── Users/
+├── Redux/
+│   └── Slices/
+├── Routes/
+├── Shared/
+│   ├── Providers/
+│   └── Theme/
+├── Storage/
+├── types/
+├── Utils/
+│   ├── api/
+│   └── services/
+└── Validations/
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+## Getting Started
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### 1. Clone the repository
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+git clone https://github.com/mohammadiyasaman/nova-admin.git
+cd nova-admin
 ```
+
+### 2. Install dependencies
+
+```bash
+npm install
+```
+
+### 3. Configure environment variables
+
+Create a `.env` file in the project root:
+
+```env
+VITE_API_BASE_URL=https://fakestoreapi.com
+```
+
+### 4. Run the application
+
+```bash
+npm run dev
+```
+
+## Demo Credentials
+
+Use the following Fake Store API test account:
+
+| Field | Value |
+|---|---|
+| Username | `mor_2314` |
+| Password | `83r5^_` |
+
+## Available Scripts
+
+| Command | Description |
+|---|---|
+| `npm run dev` | Start development server |
+| `npm run build` | TypeScript check and production build |
+| `npm run lint` | Run ESLint |
+| `npm run preview` | Preview production build |
+
+## API
+
+This project uses [Fake Store API](https://fakestoreapi.com/) for authentication and product/user data.
+
+**Note:** Fake Store API is a demo API. Create operations may return simulated responses and are not guaranteed to persist data on the server.
+
+## Author
+
+**Yasaman Mohammadi**
+
+[GitHub Repository](https://github.com/mohammadiyasaman/nova-admin)
