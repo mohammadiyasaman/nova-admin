@@ -1,22 +1,20 @@
 import * as Yup from "yup";
-import type { Translation } from "@/Dictionary/translations";
 
-type UserValidationMessages = Pick<
-  Translation,
-  | "required"
-  | "invalidEmail"
-  | "invalidUsername"
-  | "invalidPassword"
-  | "firstNameRequired"
-  | "lastNameRequired"
-  | "phoneRequired"
-  | "cityRequired"
-  | "streetRequired"
-  | "buildingNumberNumeric"
-  | "buildingNumberInteger"
-  | "buildingNumberMin"
-  | "zipCodeRequired"
->;
+type UserValidationMessages = {
+  required: string;
+  invalidEmail: string;
+  invalidUsername: string;
+  invalidPassword: string;
+  firstNameRequired: string;
+  lastNameRequired: string;
+  phoneRequired: string;
+  cityRequired: string;
+  streetRequired: string;
+  buildingNumberNumeric: string;
+  buildingNumberInteger: string;
+  buildingNumberMin: string;
+  zipCodeRequired: string;
+};
 
 export const getUserValidationSchema = (t: UserValidationMessages) =>
   Yup.object({

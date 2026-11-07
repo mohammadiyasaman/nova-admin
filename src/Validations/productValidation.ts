@@ -1,10 +1,10 @@
 import * as Yup from "yup";
-import type { Translation } from "@/Dictionary/translations";
 
-type ProductValidationMessages = Pick<
-  Translation,
-  "required" | "invalidPrice" | "invalidImageUrl"
->;
+type ProductValidationMessages = {
+  required: string;
+  invalidPrice: string;
+  invalidImageUrl: string;
+};
 
 export const getProductValidationSchema = (t: ProductValidationMessages) =>
   Yup.object({

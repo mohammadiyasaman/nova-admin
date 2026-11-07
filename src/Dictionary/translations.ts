@@ -202,6 +202,4 @@ export const translations = {
   },
 } as const;
 
-export type Translation = {
-  [K in keyof (typeof translations)["en"]]: string;
-};
+export type Translation = (typeof translations)["en"];
