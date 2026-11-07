@@ -126,7 +126,7 @@ function UsersPage() {
 
       {error.fetchAll && (
         <Alert $type="danger">
-          {error.fetchAll}
+          {t.usersLoadError}
           <SecondaryButton type="button" onClick={() => dispatch(fetchUsers())}>
             {t.retry}
           </SecondaryButton>
@@ -144,7 +144,7 @@ function UsersPage() {
       {isCreateModalOpen && (
         <UserFormModal
           isFa={isFa}
-          error={error.create}
+          error={error.create ? t.createUserError : null}
           isCreating={loading.create}
           labels={t}
           onClose={closeCreateModal}
@@ -157,7 +157,7 @@ function UsersPage() {
           isFa={isFa}
           user={selectedUser}
           isLoading={loading.fetchById}
-          error={error.fetchById}
+          error={error.fetchById ? t.userDetailsError : null}
           labels={t}
           onClose={closeDetailsModal}
         />

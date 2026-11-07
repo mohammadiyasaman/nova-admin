@@ -100,6 +100,11 @@ export const translations = {
     buildingNumberMin: "Building number must be greater than zero.",
     zipCodeRequired: "Zip code is required.",
 
+    productsLoadError: "Failed to load products.",
+    productCreateError: "Failed to create product.",
+    productDetailsError: "Failed to load product details.",
+    usersLoadError: "Failed to load users.",
+
     // Dashboard page
     totalProducts: "Total Products",
     totalUsers: "Total Users",
@@ -215,6 +220,11 @@ export const translations = {
     buildingNumberInteger: "شماره پلاک باید عدد صحیح باشد.",
     buildingNumberMin: "شماره پلاک باید بزرگ‌تر از صفر باشد.",
     zipCodeRequired: "کد پستی الزامی است.",
+
+    productsLoadError: "دریافت محصولات با خطا مواجه شد.",
+    productCreateError: "ثبت محصول با خطا مواجه شد.",
+    productDetailsError: "دریافت جزئیات محصول با خطا مواجه شد.",
+    usersLoadError: "دریافت کاربران با خطا مواجه شد.",
 
     // Dashboard page
     totalProducts: "تعداد محصولات",

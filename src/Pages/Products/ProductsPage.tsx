@@ -204,7 +204,7 @@ function ProductsPage() {
       {/* Fetch products error */}
       {errors.fetchAll && (
         <ErrorBanner role="alert">
-          {errors.fetchAll}
+          {t.productsLoadError}
 
           <button type="button" onClick={() => dispatch(fetchProducts())}>
             {t.retry}
@@ -234,7 +234,7 @@ function ProductsPage() {
         initialValues={initialValues}
         validationSchema={validationSchema}
         categories={availableCategories}
-        createError={errors.create}
+        createError={errors.create ? t.productCreateError : null}
         t={t}
         onClose={() => setIsFormOpen(false)}
         onSubmit={handleCreateProduct}
@@ -245,7 +245,7 @@ function ProductsPage() {
         isOpen={detailsOpen}
         product={selectedProduct}
         loading={loading.fetchById}
-        error={errors.fetchById}
+        error={errors.fetchById ? t.productDetailsError : null}
         t={t}
         onClose={closeDetails}
       />
