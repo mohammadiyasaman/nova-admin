@@ -1,5 +1,18 @@
 import { useEffect, useState } from "react";
-import styled from "styled-components";
+
+import {
+  PageContainer,
+  PageHeader,
+  PageTitle,
+  PageSubtitle,
+  PagePrimaryButton as PrimaryButton,
+  SecondaryButton,
+  Toolbar,
+  SearchInput,
+  UserCount,
+  PageAlert as Alert,
+  AlertClose,
+} from "./UsersPage.styles";
 
 import { useAppDispatch, useAppSelector } from "@/Redux/hooks";
 import {
@@ -154,164 +167,3 @@ function UsersPage() {
 }
 
 export default UsersPage;
-
-const PageContainer = styled.div`
-  width: 100%;
-  min-width: 0;
-  color: ${({ theme }) => theme.colors.text};
-`;
-
-const PageHeader = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 24px;
-
-  @media (max-width: 600px) {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-`;
-
-const PageTitle = styled.h1`
-  margin: 0;
-  font-size: 24px;
-  font-weight: 700;
-  color: ${({ theme }) => theme.colors.text};
-`;
-
-const PageSubtitle = styled.p`
-  margin: 8px 0 0;
-  color: ${({ theme }) => theme.colors.textSecondary};
-  font-size: 14px;
-`;
-
-const PrimaryButton = styled.button`
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  min-height: 42px;
-  padding: 11px 18px;
-  border: none;
-  border-radius: 10px;
-  background: ${({ theme }) => theme.colors.accent};
-  color: #fff;
-  font-family: inherit;
-  font-size: 14px;
-  font-weight: 600;
-  white-space: nowrap;
-  cursor: pointer;
-  transition: opacity 0.2s ease;
-
-  &:hover {
-    opacity: 0.88;
-  }
-
-  span {
-    font-size: 20px;
-    line-height: 1;
-  }
-
-  @media (max-width: 600px) {
-    width: 100%;
-  }
-`;
-
-const SecondaryButton = styled.button`
-  min-height: 40px;
-  padding: 0 16px;
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  border-radius: 9px;
-  background: ${({ theme }) => theme.colors.surface};
-  color: ${({ theme }) => theme.colors.text};
-  font-size: 13px;
-  cursor: pointer;
-
-  &:hover {
-    border-color: ${({ theme }) => theme.colors.accent};
-  }
-`;
-
-const Toolbar = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 18px;
-  min-width: 0;
-
-  @media (max-width: 600px) {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
-  }
-`;
-
-const SearchInput = styled.input`
-  width: 100%;
-  max-width: 420px;
-  min-width: 0;
-  min-height: 42px;
-  box-sizing: border-box;
-  padding: 0 14px;
-  border: 1px solid ${({ theme }) => theme.colors.border};
-  border-radius: 10px;
-  outline: none;
-  background: ${({ theme }) => theme.colors.surface};
-  color: ${({ theme }) => theme.colors.text};
-  font-family: inherit;
-  font-size: 13px;
-
-  &::placeholder {
-    color: ${({ theme }) => theme.colors.textSecondary};
-  }
-
-  &:focus {
-    border-color: ${({ theme }) => theme.colors.accent};
-  }
-
-  @media (max-width: 600px) {
-    max-width: none;
-  }
-`;
-
-const UserCount = styled.span`
-  color: ${({ theme }) => theme.colors.textSecondary};
-  font-size: 13px;
-  white-space: nowrap;
-
-  @media (max-width: 600px) {
-    align-self: flex-start;
-  }
-`;
-
-const Alert = styled.div<{ $type: "success" | "danger" }>`
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 16px;
-  padding: 12px 14px;
-  padding-inline-end: 42px;
-  border: 1px solid
-    ${({ theme, $type }) =>
-      $type === "success" ? theme.colors.success : theme.colors.danger};
-  border-radius: 9px;
-  color: ${({ theme, $type }) =>
-    $type === "success" ? theme.colors.success : theme.colors.danger};
-  font-size: 13px;
-`;
-
-const AlertClose = styled.button`
-  position: absolute;
-  inset-inline-end: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  border: none;
-  background: transparent;
-  color: inherit;
-  font-size: 20px;
-  cursor: pointer;
-`;
