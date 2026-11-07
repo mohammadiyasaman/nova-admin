@@ -21,7 +21,6 @@ The application provides an administrative interface for managing products and u
 ### Responsive Design
 ![Mobile View](./public/screenshots/mobile.png)
 
-> Screenshots will be available after adding the corresponding images to `public/screenshots/`.
 
 ## Features
 
