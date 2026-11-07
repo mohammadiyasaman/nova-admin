@@ -61,6 +61,7 @@ export const translations = {
     usersSubtitle: "View, search and manage users",
     usersSearch: "Search by name, username or email...",
     fullName: "Full Name",
+    email: "Email",
     phone: "Phone",
     noUsers: "No users found.",
     noUsersYet: "There are no users to display yet.",
@@ -160,6 +161,7 @@ export const translations = {
     usersSubtitle: "مشاهده، جست‌وجو و مدیریت کاربران",
     usersSearch: "جست‌وجو بر اساس نام، نام کاربری یا ایمیل...",
     fullName: "نام و نام خانوادگی",
+    email: "ایمیل",
     phone: "شماره تلفن",
     noUsers: "کاربری پیدا نشد.",
     noUsersYet: "هنوز کاربری برای نمایش وجود ندارد.",
@@ -199,3 +201,7 @@ export const translations = {
     zipCodeRequired: "کد پستی الزامی است.",
   },
 } as const;
+
+export type Translation = {
+  [K in keyof (typeof translations)["en"]]: string;
+};

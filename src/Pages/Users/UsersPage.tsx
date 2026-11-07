@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import { Formik, Form, Field, ErrorMessage } from "formik";
-import * as Yup from "yup";
+import { getUserValidationSchema } from "@/Validations/userValidation";
 
 import { useAppDispatch, useAppSelector } from "@/Redux/hooks";
 import {
@@ -14,41 +14,7 @@ import { useAdminUI } from "@/Shared/Providers/useAdminUI";
 import type { CreateUserPayload } from "@/types/user";
 
 /* -------------------------------------------------------------------------- */
-/*                                  Validation                                */
-/* -------------------------------------------------------------------------- */
-
-const userValidationSchema = Yup.object({
-  email: Yup.string()
-    .email("ایمیل معتبر وارد کنید")
-    .required("وارد کردن ایمیل الزامی است"),
-
-  username: Yup.string()
-    .min(3, "نام کاربری باید حداقل ۳ کاراکتر باشد")
-    .required("وارد کردن نام کاربری الزامی است"),
-
-  password: Yup.string()
-    .min(6, "رمز عبور باید حداقل ۶ کاراکتر باشد")
-    .required("وارد کردن رمز عبور الزامی است"),
-
-  name: Yup.object({
-    firstname: Yup.string().required("نام الزامی است"),
-    lastname: Yup.string().required("نام خانوادگی الزامی است"),
-  }),
-
-  phone: Yup.string().required("شماره تلفن الزامی است"),
-
-  address: Yup.object({
-    city: Yup.string().required("شهر الزامی است"),
-    street: Yup.string().required("خیابان الزامی است"),
-    number: Yup.number()
-      .typeError("شماره پلاک باید عدد باشد")
-      .integer("شماره پلاک باید عدد صحیح باشد")
-      .min(1, "شماره پلاک باید بزرگ‌تر از صفر باشد")
-      .required("شماره پلاک الزامی است"),
-    zipcode: Yup.string().required("کد پستی الزامی است"),
-  }),
-});
-
+/*                                Initial Values                              */
 const initialValues: CreateUserPayload = {
   email: "",
   username: "",
@@ -72,9 +38,10 @@ const initialValues: CreateUserPayload = {
 
 function UsersPage() {
   const dispatch = useAppDispatch();
-  const { language } = useAdminUI();
+  const { language, t } = useAdminUI();
 
   const isFa = language === "fa";
+  const userValidationSchema = getUserValidationSchema(t);
 
   const { items, selectedUser, loading, error } = useAppSelector(
     (state) => state.users,
@@ -84,52 +51,7 @@ function UsersPage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
-
-  const translations = {
-    title: isFa ? "مدیریت کاربران" : "User Management",
-    subtitle: isFa
-      ? "مشاهده، جست‌وجو و مدیریت کاربران"
-      : "View, search and manage users",
-    addUser: isFa ? "افزودن کاربر" : "Add User",
-    search: isFa
-      ? "جست‌وجو بر اساس نام، نام کاربری یا ایمیل..."
-      : "Search by name, username or email...",
-    name: isFa ? "نام و نام خانوادگی" : "Full Name",
-    username: isFa ? "نام کاربری" : "Username",
-    email: isFa ? "ایمیل" : "Email",
-    phone: isFa ? "شماره تلفن" : "Phone",
-    actions: isFa ? "عملیات" : "Actions",
-    details: isFa ? "جزئیات" : "Details",
-    noUsers: isFa ? "کاربری پیدا نشد." : "No users found.",
-    noUsersYet: isFa
-      ? "هنوز کاربری برای نمایش وجود ندارد."
-      : "There are no users to display yet.",
-    loading: isFa ? "در حال دریافت اطلاعات کاربران..." : "Loading users...",
-    retry: isFa ? "تلاش مجدد" : "Try Again",
-    createTitle: isFa ? "افزودن کاربر جدید" : "Add New User",
-    detailsTitle: isFa ? "جزئیات کاربر" : "User Details",
-    firstName: isFa ? "نام" : "First Name",
-    lastName: isFa ? "نام خانوادگی" : "Last Name",
-    password: isFa ? "رمز عبور" : "Password",
-    city: isFa ? "شهر" : "City",
-    street: isFa ? "خیابان" : "Street",
-    number: isFa ? "شماره پلاک" : "Building Number",
-    zipcode: isFa ? "کد پستی" : "Zip Code",
-    cancel: isFa ? "انصراف" : "Cancel",
-    save: isFa ? "ثبت کاربر" : "Create User",
-    creating: isFa ? "در حال ثبت..." : "Creating...",
-    close: isFa ? "بستن" : "Close",
-    userCreated: isFa
-      ? "کاربر جدید با موفقیت ثبت شد."
-      : "User created successfully.",
-    address: isFa ? "آدرس" : "Address",
-    userId: isFa ? "شناسه کاربر" : "User ID",
-    createError: isFa ? "ثبت کاربر با خطا مواجه شد." : "Failed to create user.",
-    detailsError: isFa
-      ? "دریافت اطلاعات کاربر با خطا مواجه شد."
-      : "Failed to load user details.",
-  };
-
+  
   /* ------------------------------- Fetch Users ------------------------------ */
 
   useEffect(() => {
@@ -194,7 +116,7 @@ function UsersPage() {
 
       resetForm();
       setIsCreateModalOpen(false);
-      setSuccessMessage(translations.userCreated);
+      setSuccessMessage(t.userCreated);
     } catch {
       // خطای ثبت از طریق Redux در error.create نگهداری می‌شود.
     }
@@ -208,13 +130,13 @@ function UsersPage() {
     <PageContainer dir={isFa ? "rtl" : "ltr"}>
       <PageHeader>
         <div>
-          <PageTitle>{translations.title}</PageTitle>
-          <PageSubtitle>{translations.subtitle}</PageSubtitle>
+          <PageTitle>{t.usersTitle}</PageTitle>
+          <PageSubtitle>{t.usersSubtitle}</PageSubtitle>
         </div>
 
         <PrimaryButton type="button" onClick={openCreateModal}>
           <span>+</span>
-          {translations.addUser}
+          {t.addUser}
         </PrimaryButton>
       </PageHeader>
 
@@ -224,7 +146,7 @@ function UsersPage() {
           <AlertClose
             type="button"
             onClick={() => setSuccessMessage("")}
-            aria-label="Close"
+            aria-label={t.close}
           >
             ×
           </AlertClose>
@@ -236,11 +158,11 @@ function UsersPage() {
           type="text"
           value={search}
           onChange={(event) => setSearch(event.target.value)}
-          placeholder={translations.search}
+          placeholder={t.usersSearch}
         />
 
         <UserCount>
-          {isFa ? "تعداد کاربران:" : "Users:"} {filteredUsers.length}
+          {t.usersCount} {filteredUsers.length}
         </UserCount>
       </Toolbar>
 
@@ -248,7 +170,7 @@ function UsersPage() {
         <Alert $type="danger">
           {error.fetchAll}
           <SecondaryButton type="button" onClick={() => dispatch(fetchUsers())}>
-            {translations.retry}
+            {t.retry}
           </SecondaryButton>
         </Alert>
       )}
@@ -257,11 +179,11 @@ function UsersPage() {
         <UsersTable>
           <thead>
             <tr>
-              <th>{translations.name}</th>
-              <th>{translations.username}</th>
-              <th>{translations.email}</th>
-              <th>{translations.phone}</th>
-              <th>{translations.actions}</th>
+              <th>{t.fullName}</th>
+              <th>{t.username}</th>
+              <th>{t.email}</th>
+              <th>{t.phone}</th>
+              <th>{t.actions}</th>
             </tr>
           </thead>
 
@@ -271,14 +193,14 @@ function UsersPage() {
                 <EmptyCell colSpan={5}>
                   <LoadingContent>
                     <Spinner />
-                    {translations.loading}
+                    {t.loadingUsers}
                   </LoadingContent>
                 </EmptyCell>
               </tr>
             ) : filteredUsers.length === 0 ? (
               <tr>
                 <EmptyCell colSpan={5}>
-                  {search ? translations.noUsers : translations.noUsersYet}
+                  {search ? t.noUsers : t.noUsersYet}
                 </EmptyCell>
               </tr>
             ) : (
@@ -301,7 +223,7 @@ function UsersPage() {
                       type="button"
                       onClick={() => openDetailsModal(user.id)}
                     >
-                      {translations.details}
+                      {t.details}
                     </TableAction>
                   </td>
                 </tr>
@@ -317,21 +239,19 @@ function UsersPage() {
         <ModalOverlay>
           <ModalContent dir={isFa ? "rtl" : "ltr"}>
             <ModalHeader>
-              <ModalTitle>{translations.createTitle}</ModalTitle>
+              <ModalTitle>{t.addNewUser}</ModalTitle>
 
               <IconButton
                 type="button"
                 onClick={closeCreateModal}
-                aria-label={translations.close}
+                aria-label={t.close}
               >
                 ×
               </IconButton>
             </ModalHeader>
 
             {error.create && (
-              <Alert $type="danger">
-                {error.create || translations.createError}
-              </Alert>
+              <Alert $type="danger">{error.create || t.createUserError}</Alert>
             )}
 
             <Formik
@@ -343,10 +263,10 @@ function UsersPage() {
                 <Form>
                   <FormGrid>
                     <FormField>
-                      <FieldLabel>{translations.firstName}</FieldLabel>
+                      <FieldLabel>{t.firstName}</FieldLabel>
                       <StyledField
                         name="name.firstname"
-                        placeholder={translations.firstName}
+                        placeholder={t.firstName}
                       />
                       <ErrorMessage
                         name="name.firstname"
@@ -355,10 +275,10 @@ function UsersPage() {
                     </FormField>
 
                     <FormField>
-                      <FieldLabel>{translations.lastName}</FieldLabel>
+                      <FieldLabel>{t.lastName}</FieldLabel>
                       <StyledField
                         name="name.lastname"
-                        placeholder={translations.lastName}
+                        placeholder={t.lastName}
                       />
                       <ErrorMessage
                         name="name.lastname"
@@ -367,49 +287,40 @@ function UsersPage() {
                     </FormField>
 
                     <FormField>
-                      <FieldLabel>{translations.username}</FieldLabel>
-                      <StyledField
-                        name="username"
-                        placeholder={translations.username}
-                      />
+                      <FieldLabel>{t.username}</FieldLabel>
+                      <StyledField name="username" placeholder={t.username} />
                       <ErrorMessage name="username" component={FieldError} />
                     </FormField>
 
                     <FormField>
-                      <FieldLabel>{translations.email}</FieldLabel>
+                      <FieldLabel>{t.email}</FieldLabel>
                       <StyledField
                         name="email"
                         type="email"
-                        placeholder={translations.email}
+                        placeholder={t.email}
                       />
                       <ErrorMessage name="email" component={FieldError} />
                     </FormField>
 
                     <FormField>
-                      <FieldLabel>{translations.password}</FieldLabel>
+                      <FieldLabel>{t.password}</FieldLabel>
                       <StyledField
                         name="password"
                         type="password"
-                        placeholder={translations.password}
+                        placeholder={t.password}
                       />
                       <ErrorMessage name="password" component={FieldError} />
                     </FormField>
 
                     <FormField>
-                      <FieldLabel>{translations.phone}</FieldLabel>
-                      <StyledField
-                        name="phone"
-                        placeholder={translations.phone}
-                      />
+                      <FieldLabel>{t.phone}</FieldLabel>
+                      <StyledField name="phone" placeholder={t.phone} />
                       <ErrorMessage name="phone" component={FieldError} />
                     </FormField>
 
                     <FormField>
-                      <FieldLabel>{translations.city}</FieldLabel>
-                      <StyledField
-                        name="address.city"
-                        placeholder={translations.city}
-                      />
+                      <FieldLabel>{t.city}</FieldLabel>
+                      <StyledField name="address.city" placeholder={t.city} />
                       <ErrorMessage
                         name="address.city"
                         component={FieldError}
@@ -417,10 +328,10 @@ function UsersPage() {
                     </FormField>
 
                     <FormField>
-                      <FieldLabel>{translations.street}</FieldLabel>
+                      <FieldLabel>{t.street}</FieldLabel>
                       <StyledField
                         name="address.street"
-                        placeholder={translations.street}
+                        placeholder={t.street}
                       />
                       <ErrorMessage
                         name="address.street"
@@ -429,12 +340,12 @@ function UsersPage() {
                     </FormField>
 
                     <FormField>
-                      <FieldLabel>{translations.number}</FieldLabel>
+                      <FieldLabel>{t.buildingNumber}</FieldLabel>
                       <StyledField
                         name="address.number"
                         type="number"
                         min="1"
-                        placeholder={translations.number}
+                        placeholder={t.buildingNumber}
                       />
                       <ErrorMessage
                         name="address.number"
@@ -443,10 +354,10 @@ function UsersPage() {
                     </FormField>
 
                     <FormField>
-                      <FieldLabel>{translations.zipcode}</FieldLabel>
+                      <FieldLabel>{t.zipCode}</FieldLabel>
                       <StyledField
                         name="address.zipcode"
-                        placeholder={translations.zipcode}
+                        placeholder={t.zipCode}
                       />
                       <ErrorMessage
                         name="address.zipcode"
@@ -457,7 +368,7 @@ function UsersPage() {
 
                   <ModalActions>
                     <SecondaryButton type="button" onClick={closeCreateModal}>
-                      {translations.cancel}
+                      {t.cancel}
                     </SecondaryButton>
 
                     <PrimaryButton
@@ -465,8 +376,8 @@ function UsersPage() {
                       disabled={loading.create || isSubmitting}
                     >
                       {loading.create || isSubmitting
-                        ? translations.creating
-                        : translations.save}
+                        ? t.creatingUser
+                        : t.createUser}
                     </PrimaryButton>
                   </ModalActions>
                 </Form>
@@ -482,12 +393,12 @@ function UsersPage() {
         <ModalOverlay>
           <ModalContent dir={isFa ? "rtl" : "ltr"}>
             <ModalHeader>
-              <ModalTitle>{translations.detailsTitle}</ModalTitle>
+              <ModalTitle>{t.userDetails}</ModalTitle>
 
               <IconButton
                 type="button"
                 onClick={closeDetailsModal}
-                aria-label={translations.close}
+                aria-label={t.close}
               >
                 ×
               </IconButton>
@@ -496,43 +407,43 @@ function UsersPage() {
             {loading.fetchById ? (
               <LoadingContent>
                 <Spinner />
-                {isFa ? "در حال دریافت اطلاعات..." : "Loading details..."}
+                {t.loadingUserDetails}
               </LoadingContent>
             ) : error.fetchById ? (
               <Alert $type="danger">
-                {error.fetchById || translations.detailsError}
+                {error.fetchById || t.userDetailsError}
               </Alert>
             ) : selectedUser ? (
               <DetailsGrid>
                 <DetailItem>
-                  <DetailLabel>{translations.userId}</DetailLabel>
+                  <DetailLabel>{t.userId}</DetailLabel>
                   <DetailValue>{selectedUser.id}</DetailValue>
                 </DetailItem>
 
                 <DetailItem>
-                  <DetailLabel>{translations.name}</DetailLabel>
+                  <DetailLabel>{t.fullName}</DetailLabel>
                   <DetailValue>
                     {selectedUser.name.firstname} {selectedUser.name.lastname}
                   </DetailValue>
                 </DetailItem>
 
                 <DetailItem>
-                  <DetailLabel>{translations.username}</DetailLabel>
+                  <DetailLabel>{t.username}</DetailLabel>
                   <DetailValue>{selectedUser.username}</DetailValue>
                 </DetailItem>
 
                 <DetailItem>
-                  <DetailLabel>{translations.email}</DetailLabel>
+                  <DetailLabel>{t.email}</DetailLabel>
                   <DetailValue>{selectedUser.email}</DetailValue>
                 </DetailItem>
 
                 <DetailItem>
-                  <DetailLabel>{translations.phone}</DetailLabel>
+                  <DetailLabel>{t.phone}</DetailLabel>
                   <DetailValue>{selectedUser.phone}</DetailValue>
                 </DetailItem>
 
                 <DetailItem $fullWidth>
-                  <DetailLabel>{translations.address}</DetailLabel>
+                  <DetailLabel>{t.address}</DetailLabel>
                   <DetailValue>
                     {selectedUser.address.city}, {selectedUser.address.street},{" "}
                     {selectedUser.address.number}
@@ -542,12 +453,12 @@ function UsersPage() {
                 </DetailItem>
               </DetailsGrid>
             ) : (
-              <EmptyMessage>{translations.noUsers}</EmptyMessage>
+              <EmptyMessage>{t.noUsers}</EmptyMessage>
             )}
 
             <ModalActions>
               <SecondaryButton type="button" onClick={closeDetailsModal}>
-                {translations.close}
+                {t.close}
               </SecondaryButton>
             </ModalActions>
           </ModalContent>

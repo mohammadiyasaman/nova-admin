@@ -2,8 +2,6 @@ import { useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import type { FormikHelpers } from "formik";
-import * as Yup from "yup";
-
 import { useAppDispatch, useAppSelector } from "@/Redux/hooks";
 import {
   fetchProducts,
@@ -12,14 +10,22 @@ import {
 } from "@/Redux/Slices/productThunks";
 import { productService } from "@/Utils/services/productService";
 import { useAdminUI } from "@/Shared/Providers/useAdminUI";
+import { getProductValidationSchema } from "@/Validations/productValidation";
 import type { CreateProductPayload, Product } from "@/types/product";
 
 const PAGE_SIZE = 8;
 
+const initialValues: CreateProductPayload = {
+  title: "",
+  price: 0,
+  description: "",
+  category: "",
+  image: "",
+};
+
 function ProductsPage() {
   const dispatch = useAppDispatch();
-  const { language } = useAdminUI();
-  const isFa = language === "fa";
+  const { t } = useAdminUI();
 
   const products = useAppSelector((state) => state.products.items);
   const selectedProduct = useAppSelector(
@@ -37,55 +43,16 @@ function ProductsPage() {
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
 
-  const labels = {
-    title: isFa ? "مدیریت محصولات" : "Products",
-    subtitle: isFa
-      ? "مشاهده و مدیریت محصولات فروشگاه"
-      : "View and manage store products",
-    add: isFa ? "افزودن محصول" : "Add Product",
-    search: isFa ? "جست‌وجوی محصول..." : "Search products...",
-    category: isFa ? "همه دسته‌بندی‌ها" : "All categories",
-    sort: isFa ? "مرتب‌سازی" : "Sort by",
-    default: isFa ? "پیش‌فرض" : "Default",
-    low: isFa ? "قیمت: کم به زیاد" : "Price: Low to High",
-    high: isFa ? "قیمت: زیاد به کم" : "Price: High to Low",
-    name: isFa ? "نام محصول" : "Product",
-    price: isFa ? "قیمت" : "Price",
-    categoryColumn: isFa ? "دسته‌بندی" : "Category",
-    actions: isFa ? "عملیات" : "Actions",
-    details: isFa ? "جزئیات" : "Details",
-    noData: isFa ? "محصولی پیدا نشد." : "No products found.",
-    loading: isFa ? "در حال دریافت اطلاعات..." : "Loading products...",
-    retry: isFa ? "تلاش مجدد" : "Retry",
-    previous: isFa ? "قبلی" : "Previous",
-    next: isFa ? "بعدی" : "Next",
-    page: isFa ? "صفحه" : "Page",
-    of: isFa ? "از" : "of",
-    formTitle: isFa ? "افزودن محصول جدید" : "Add New Product",
-    productTitle: isFa ? "عنوان محصول" : "Product title",
-    description: isFa ? "توضیحات" : "Description",
-    image: isFa ? "آدرس تصویر" : "Image URL",
-    cancel: isFa ? "انصراف" : "Cancel",
-    save: isFa ? "ثبت محصول" : "Save Product",
-    saving: isFa ? "در حال ثبت..." : "Saving...",
-    required: isFa ? "این فیلد الزامی است." : "This field is required.",
-    invalidPrice: isFa
-      ? "قیمت باید عددی بزرگ‌تر از صفر باشد."
-      : "Price must be greater than zero.",
-    created: isFa ? "محصول با موفقیت ثبت شد." : "Product created successfully.",
-    close: isFa ? "بستن" : "Close",
-    rating: isFa ? "امتیاز" : "Rating",
-    count: isFa ? "تعداد رأی" : "Reviews",
-  };
+  const validationSchema = getProductValidationSchema(t);
 
-  // دریافت محصولات
+  // Fetch products
   useEffect(() => {
     if (products.length === 0) {
       dispatch(fetchProducts());
     }
   }, [dispatch, products.length]);
 
-  // دریافت دسته‌بندی‌ها
+  // Fetch categories
   useEffect(() => {
     let isActive = true;
 
@@ -97,7 +64,7 @@ function ProductsPage() {
         }
       })
       .catch(() => {
-        // در صورت خطا، دسته‌بندی‌ها از محصولات استخراج می‌شوند.
+        // If the request fails, categories are derived from the products list.
       });
 
     return () => {
@@ -105,7 +72,7 @@ function ProductsPage() {
     };
   }, []);
 
-  // فیلتر و مرتب‌سازی محصولات
+  // Filter and sort products
   const filteredProducts = useMemo(() => {
     const normalizedSearch = search.trim().toLowerCase();
 
@@ -146,27 +113,6 @@ function ProductsPage() {
     currentPage * PAGE_SIZE,
   );
 
-  const validationSchema = Yup.object({
-    title: Yup.string().trim().required(labels.required),
-    price: Yup.number()
-      .typeError(labels.invalidPrice)
-      .moreThan(0, labels.invalidPrice)
-      .required(labels.required),
-    description: Yup.string().trim().required(labels.required),
-    category: Yup.string().required(labels.required),
-    image: Yup.string()
-      .url(isFa ? "آدرس تصویر معتبر نیست." : "Enter a valid image URL.")
-      .required(labels.required),
-  });
-
-  const initialValues: CreateProductPayload = {
-    title: "",
-    price: 0,
-    description: "",
-    category: "",
-    image: "",
-  };
-
   const handleCreateProduct = async (
     values: CreateProductPayload,
     { resetForm, setSubmitting }: FormikHelpers<CreateProductPayload>,
@@ -174,12 +120,12 @@ function ProductsPage() {
     try {
       await dispatch(createProduct(values)).unwrap();
 
-      setSuccessMessage(labels.created);
+      setSuccessMessage(t.productCreated);
       setIsFormOpen(false);
       resetForm();
       setCurrentPage(1);
     } catch {
-      // خطای درخواست در Redux ذخیره می‌شود.
+      // The request error is stored in Redux.
     } finally {
       setSubmitting(false);
     }
@@ -191,7 +137,7 @@ function ProductsPage() {
     try {
       await dispatch(fetchProductById(product.id)).unwrap();
     } catch {
-      // اطلاعات محصول از لیست همچنان در دسترس است.
+      // The product information from the list remains available.
     }
   };
 
@@ -203,24 +149,31 @@ function ProductsPage() {
     <Page>
       <PageHeader>
         <div>
-          <Title>{labels.title}</Title>
-          <Subtitle>{labels.subtitle}</Subtitle>
+          <Title>{t.productsTitle}</Title>
+          <Subtitle>{t.productsSubtitle}</Subtitle>
         </div>
 
         <PrimaryButton
+          type="button"
           onClick={() => {
             setSuccessMessage("");
             setIsFormOpen(true);
           }}
         >
-          + {labels.add}
+          + {t.addProduct}
         </PrimaryButton>
       </PageHeader>
 
       {successMessage && (
         <SuccessBanner role="status">
           {successMessage}
-          <button onClick={() => setSuccessMessage("")}>×</button>
+          <button
+            type="button"
+            onClick={() => setSuccessMessage("")}
+            aria-label={t.close}
+          >
+            ×
+          </button>
         </SuccessBanner>
       )}
 
@@ -231,8 +184,8 @@ function ProductsPage() {
             setSearch(event.target.value);
             setCurrentPage(1);
           }}
-          placeholder={labels.search}
-          aria-label={labels.search}
+          placeholder={t.productsSearch}
+          aria-label={t.productsSearch}
         />
 
         <Select
@@ -241,9 +194,9 @@ function ProductsPage() {
             setCategory(event.target.value);
             setCurrentPage(1);
           }}
-          aria-label={labels.category}
+          aria-label={t.allCategories}
         >
-          <option value="">{labels.category}</option>
+          <option value="">{t.allCategories}</option>
 
           {availableCategories.map((item) => (
             <option value={item} key={item}>
@@ -258,37 +211,37 @@ function ProductsPage() {
             setSort(event.target.value);
             setCurrentPage(1);
           }}
-          aria-label={labels.sort}
+          aria-label={t.sortBy}
         >
-          <option value="default">{labels.default}</option>
-          <option value="price-asc">{labels.low}</option>
-          <option value="price-desc">{labels.high}</option>
+          <option value="default">{t.sortDefault}</option>
+          <option value="price-asc">{t.sortPriceLow}</option>
+          <option value="price-desc">{t.sortPriceHigh}</option>
         </Select>
       </Toolbar>
 
       {errors.fetchAll && (
         <ErrorBanner role="alert">
           {errors.fetchAll}
-          <button onClick={() => dispatch(fetchProducts())}>
-            {labels.retry}
+          <button type="button" onClick={() => dispatch(fetchProducts())}>
+            {t.retry}
           </button>
         </ErrorBanner>
       )}
 
       <TableCard>
         {loading.fetchAll && products.length === 0 ? (
-          <StateMessage>{labels.loading}</StateMessage>
+          <StateMessage>{t.loadingProducts}</StateMessage>
         ) : visibleProducts.length === 0 ? (
-          <StateMessage>{labels.noData}</StateMessage>
+          <StateMessage>{t.noProducts}</StateMessage>
         ) : (
           <TableWrapper>
             <Table>
               <thead>
                 <tr>
-                  <th>{labels.name}</th>
-                  <th>{labels.categoryColumn}</th>
-                  <th>{labels.price}</th>
-                  <th>{labels.actions}</th>
+                  <th>{t.productName}</th>
+                  <th>{t.category}</th>
+                  <th>{t.price}</th>
+                  <th>{t.actions}</th>
                 </tr>
               </thead>
 
@@ -311,8 +264,11 @@ function ProductsPage() {
                     </td>
 
                     <td>
-                      <SecondaryButton onClick={() => handleDetails(product)}>
-                        {labels.details}
+                      <SecondaryButton
+                        type="button"
+                        onClick={() => handleDetails(product)}
+                      >
+                        {t.details}
                       </SecondaryButton>
                     </td>
                   </tr>
@@ -325,22 +281,24 @@ function ProductsPage() {
 
       <Pagination>
         <span>
-          {labels.page} {currentPage} {labels.of} {totalPages}
+          {t.page} {currentPage} {t.of} {totalPages}
         </span>
 
         <div>
           <PageButton
+            type="button"
             disabled={currentPage <= 1}
             onClick={() => setCurrentPage((page) => page - 1)}
           >
-            {labels.previous}
+            {t.previous}
           </PageButton>
 
           <PageButton
+            type="button"
             disabled={currentPage >= totalPages}
             onClick={() => setCurrentPage((page) => page + 1)}
           >
-            {labels.next}
+            {t.next}
           </PageButton>
         </div>
       </Pagination>
@@ -349,9 +307,13 @@ function ProductsPage() {
         <Overlay onClick={() => setIsFormOpen(false)}>
           <Modal onClick={(event) => event.stopPropagation()}>
             <ModalHeader>
-              <h2>{labels.formTitle}</h2>
+              <h2>{t.addNewProduct}</h2>
 
-              <CloseButton type="button" onClick={() => setIsFormOpen(false)}>
+              <CloseButton
+                type="button"
+                onClick={() => setIsFormOpen(false)}
+                aria-label={t.close}
+              >
                 ×
               </CloseButton>
             </ModalHeader>
@@ -364,13 +326,13 @@ function ProductsPage() {
               {({ isSubmitting }) => (
                 <StyledForm>
                   <FormGroup>
-                    <FormLabel>{labels.productTitle}</FormLabel>
+                    <FormLabel>{t.productTitle}</FormLabel>
                     <StyledField name="title" />
                     <FieldError name="title" component="div" />
                   </FormGroup>
 
                   <FormGroup>
-                    <FormLabel>{labels.price}</FormLabel>
+                    <FormLabel>{t.price}</FormLabel>
                     <StyledField
                       name="price"
                       type="number"
@@ -381,10 +343,10 @@ function ProductsPage() {
                   </FormGroup>
 
                   <FormGroup>
-                    <FormLabel>{labels.categoryColumn}</FormLabel>
+                    <FormLabel>{t.category}</FormLabel>
 
                     <StyledField as="select" name="category">
-                      <option value="">{labels.category}</option>
+                      <option value="">{t.allCategories}</option>
 
                       {availableCategories.map((item) => (
                         <option value={item} key={item}>
@@ -397,13 +359,13 @@ function ProductsPage() {
                   </FormGroup>
 
                   <FormGroup>
-                    <FormLabel>{labels.image}</FormLabel>
+                    <FormLabel>{t.imageUrl}</FormLabel>
                     <StyledField name="image" />
                     <FieldError name="image" component="div" />
                   </FormGroup>
 
                   <FormGroup>
-                    <FormLabel>{labels.description}</FormLabel>
+                    <FormLabel>{t.description}</FormLabel>
                     <StyledField as="textarea" name="description" rows={4} />
                     <FieldError name="description" component="div" />
                   </FormGroup>
@@ -417,11 +379,11 @@ function ProductsPage() {
                       type="button"
                       onClick={() => setIsFormOpen(false)}
                     >
-                      {labels.cancel}
+                      {t.cancel}
                     </SecondaryButton>
 
                     <PrimaryButton type="submit" disabled={isSubmitting}>
-                      {isSubmitting ? labels.saving : labels.save}
+                      {isSubmitting ? t.savingProduct : t.saveProduct}
                     </PrimaryButton>
                   </FormActions>
                 </StyledForm>
@@ -435,22 +397,26 @@ function ProductsPage() {
         <Overlay onClick={closeDetails}>
           <Modal onClick={(event) => event.stopPropagation()}>
             <ModalHeader>
-              <h2>{labels.details}</h2>
+              <h2>{t.details}</h2>
 
-              <CloseButton type="button" onClick={closeDetails}>
+              <CloseButton
+                type="button"
+                onClick={closeDetails}
+                aria-label={t.close}
+              >
                 ×
               </CloseButton>
             </ModalHeader>
 
             {loading.fetchById ? (
-              <StateMessage>{labels.loading}</StateMessage>
+              <StateMessage>{t.loadingProducts}</StateMessage>
             ) : (
               <DetailsContent>
                 {(() => {
                   const item = selectedProduct;
 
                   if (!item) {
-                    return <StateMessage>{labels.noData}</StateMessage>;
+                    return <StateMessage>{t.noProducts}</StateMessage>;
                   }
 
                   return (
@@ -462,8 +428,8 @@ function ProductsPage() {
                       <p>{item.description}</p>
 
                       <small>
-                        {labels.rating}: {item.rating?.rate ?? "—"} / 5{" · "}
-                        {labels.count}: {item.rating?.count ?? "—"}
+                        {t.rating}: {item.rating?.rate ?? "—"} / 5{" · "}
+                        {t.reviews}: {item.rating?.count ?? "—"}
                       </small>
                     </>
                   );
