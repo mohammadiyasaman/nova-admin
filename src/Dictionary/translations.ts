@@ -99,6 +99,22 @@ export const translations = {
     buildingNumberInteger: "Building number must be an integer.",
     buildingNumberMin: "Building number must be greater than zero.",
     zipCodeRequired: "Zip code is required.",
+
+    // Dashboard page
+    totalProducts: "Total Products",
+    totalUsers: "Total Users",
+    categories: "Categories",
+    dashboardSubtitle: "An overview of your NOVA store",
+    dashboardLoadError: "Some dashboard data could not be loaded.",
+    recentProducts: "Recent Products",
+
+    // Login page
+    loginSubtitle: "Sign in to your account",
+    switchToEnglish: "English",
+    switchToPersian: "فارسی",
+    usernamePlaceholder: "Enter your username",
+    passwordPlaceholder: "Enter your password",
+    signingIn: "Signing in...",
   },
 
   fa: {
@@ -199,6 +215,22 @@ export const translations = {
     buildingNumberInteger: "شماره پلاک باید عدد صحیح باشد.",
     buildingNumberMin: "شماره پلاک باید بزرگ‌تر از صفر باشد.",
     zipCodeRequired: "کد پستی الزامی است.",
+
+    // Dashboard page
+    totalProducts: "تعداد محصولات",
+    totalUsers: "تعداد کاربران",
+    categories: "دسته‌بندی‌ها",
+    dashboardSubtitle: "نمای کلی وضعیت فروشگاه نوا",
+    dashboardLoadError: "دریافت بخشی از اطلاعات با خطا مواجه شد.",
+    recentProducts: "آخرین محصولات",
+
+    // Login page
+    loginSubtitle: "به حساب کاربری خود وارد شوید",
+    switchToEnglish: "English",
+    switchToPersian: "فارسی",
+    usernamePlaceholder: "نام کاربری خود را وارد کنید",
+    passwordPlaceholder: "رمز عبور خود را وارد کنید",
+    signingIn: "در حال ورود...",
   },
 } as const;
 
